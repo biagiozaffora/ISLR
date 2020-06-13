@@ -252,13 +252,41 @@ library(ISLR)
 #   CHAPTER 4
 ########################
 
+library(ISLR)
+
 # 4.6 Lab : Logistic regression, LDA, QDA, and KNN
 
 # 4.6.1 The Stock Market data
 
+head(Smarket)
+names(Smarket)
+dim(Smarket)
+summary(Smarket)
 
+cor(Smarket[, -9])
 
+attach(Smarket)
+plot(Volume)
 
+# 4.6.2 Logistic regression
+
+glm.fits <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Smarket,
+                family="binomial")
+summary(glm.fits)
+
+coef(glm.fits)
+summary(glm.fits)$coef
+
+glm.probs <- predict(glm.fits, type="response")
+glm.probs[1:10]
+
+contrasts(Direction)
+
+glm.pred <- rep("Down", 1250)
+glm.pred[glm.probs > 0.5] <- "Up"
+glm.pred
+
+table(glm.pred, Direction)
 
 
 
