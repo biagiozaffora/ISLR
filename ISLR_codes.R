@@ -288,16 +288,56 @@ glm.pred
 
 table(glm.pred, Direction)
 
+# held out sample for test accuracy
+train <- Year < 2005
+Smarket.2005 <- Smarket[!train, ]
+dim(Smarket.2005)
+Direction.2005 <- Direction[!train]
+
+glm.fits <- glm(Direction ~Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,
+                data = Smarket, family=binomial, subset=train)
+
+glm.probs <- predict(glm.fits, Smarket.2005, type='response')
+
+glm.pred <- rep("Down", 252)
+glm.pred[glm.probs > 0.5] <- "Up"
+table(glm.pred, Direction.2005)
+
+# test error
+1 - mean(glm.pred == Direction.2005)
+
+# Removing higher lags
+
+glm.fits <- glm(Direction ~Lag1 + Lag2,
+                data = Smarket, family=binomial, subset=train)
+
+glm.probs <- predict(glm.fits, Smarket.2005, type='response')
+
+glm.pred <- rep("Down", 252)
+glm.pred[glm.probs > 0.5] <- "Up"
+table(glm.pred, Direction.2005)
+
+1 - mean(glm.pred == Direction.2005)
+
+# Prediction using a model
+predict(glm.fits, newdata=data.frame(Lag1=c(1.2, 1.5), Lag2=c(1.1, -0.8)), type='response')
 
 
+# 4.6.3 LDA
 
+library(MASS)
 
+lda.fit <- lda(Direction ~ Lag1 + Lag2, data=Smarket, subset = train)
+lda.fit
 
+plot(lda.fit)
 
+lda.pred <- predict(lda.fit, Smarket.2005)
+names(lda.pred)
 
+lda.class <- lda.pred$class
 
-
-
+table(lda.class, Direction.2005)
 
 
 
